@@ -1,3 +1,4 @@
+
 class MarvelService {
   // начально название пути нашего API
   _apiBase = 'https://gateway.marvel.com:443/v1/public/';
@@ -18,14 +19,32 @@ class MarvelService {
   }
 
   // Метод получения всех персонажей
-  getAllCharacters = () => {
-    return this.getResource(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`);
+  getAllCharacters = async () => {
+    const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`);
+    return res.data.results.map(this._transformCharacter);
   }
 
-  // Метод получение одного персонажа
-  getCharacter = (id) => {
-    return this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
+  // Метод получение одного персонажа из API 
+  getCharacter = async (id) => {
+    const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
+    // передадим res в метод _transformCharacter для формирования объекта данных, который мы в дальнейшем будем использовать в приложении
+    return this._transformCharacter(res.data.results[0]);
   }
+
+  // Метод будет возвращать трансформированный объект
+  _transformCharacter = (char) => {
+    return {
+      name: char.name,
+      description: char.description ? `${char.description.slice(0, 220)}...` : 'There is no information about this character',
+      thumbnail: char.thumbnail.path + '.' + char.thumbnail.extension,
+      homepage: char.urls[0].url,
+      wiki: char.urls[1].url
+    }    
+  }
+
+
+
+
 }
 
 export default MarvelService;
