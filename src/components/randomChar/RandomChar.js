@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Spinner from '../spinner/spinner';
 import ErrorMessage from '../errorMessage/errorMessage';
-import MarvelService from '../../services/MarvelService';
+import useMarvelService from '../../services/MarvelService';
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -10,11 +10,9 @@ import mjolnir from '../../resources/img/mjolnir.png';
 const RandomChar = () => {
 
     const [char, setChar] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(false); 
 
     // создадим экземпляр класса для вызова методов
-    const marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     // вызываем updateChar() в уже отрисованном компоненте 
     useEffect(() => {
@@ -30,29 +28,18 @@ const RandomChar = () => {
     // методв записи в state данных о персонаже из API
     // пердадим loading: false чтобы убрать спиннер
     const onCharLoaded = (char) => {
-        setChar(char);
-        setLoading(false);      
+        setChar(char);     
     }
 
-    const onCharLoading = () => {
-        setLoading(true);
-    }
-
-    //метод отлова ошибок
-    const onError = () => {
-        setLoading(false);
-        setError(true);
-    }
 
     const updateChar = () => {
+        //убираем ошибку при загрузке отсутствующего персонажа (чтобы можно было загрузить нового)
+        clearError();
         // рандомный id 
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        onCharLoading();
         // получение данных о рандомном персонаже
-        marvelService
-            .getCharacter(id)            
-            .then(onCharLoaded)
-            .catch(onError);
+        getCharacter(id)            
+            .then(onCharLoaded);
     }     
     
 
