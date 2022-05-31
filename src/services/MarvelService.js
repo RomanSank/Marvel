@@ -9,11 +9,17 @@ const useMarvelService = () => {
   const _apiKey = 'apikey=5344f54a02afb71cecda017f39394805';
 
   const _baseOffset = 210;
+  const _limitChar = 'limit=9&';
+  // characters?nameStartsWith=tho&apikey=5344f54a02afb71cecda017f39394805
+  const getCharacterByName = async (name) => {
+    const res = await request(`${_apiBase}characters?name=${name}&${_apiKey}`);
+    return res.data.results.map(_transformCharacter);
+}
 
 
   // Метод получения всех персонажей
-  const getAllCharacters = async (offset = _baseOffset) => {
-    const res = await request(`${_apiBase}characters?limit=9&offset=${offset}&${_apiKey}`);
+  const getAllCharacters = async (offset = _baseOffset, limit = _limitChar) => {
+    const res = await request(`${_apiBase}characters?${limit}offset=${offset}&${_apiKey}`);
     return res.data.results.map(_transformCharacter);
   }
 
@@ -59,7 +65,7 @@ const useMarvelService = () => {
     }
   }
 
-  return {loading, error, clearError, getAllCharacters, getCharacter, getAllComics, getComic};
+  return {loading, error, clearError, getAllCharacters, getCharacter, getAllComics, getComic, getCharacterByName};
 
 
 }
